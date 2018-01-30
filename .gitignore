@@ -62,3 +62,5 @@ envrc
 dist/
 
 db/dev.db
+db/prod.db
+db/test.db

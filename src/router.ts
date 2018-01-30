@@ -11,5 +11,9 @@ export default function(app) {
 
     router.post("/api/status", statusController.index);
 
+    router.get("/test", payMentontroller.testGet);
+
+    router.get("/test2", payMentontroller.test2Get);
+
     app.use(router.routes()).use(router.allowedMethods());
 }
