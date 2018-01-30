@@ -4,16 +4,12 @@ import StatusController from "./controller/status";
 
 export default function(app) {
     const router = new Router();
+    const payMentontroller = new PaymentController();
+    const statusController = new StatusController();
 
-    router.get("/api/payment/qrcode", (...args) => {
-        const controller = new PaymentController();
-        return controller.genPayQr.call(controller, ...args);
-    });
+    router.post("/api/payment/qrcode", payMentontroller.genPayQr);
 
-    router.post("/api/status", (...args) => {
-        const controller = new StatusController();
-        return controller.index.call(controller, ...args);
-    });
+    router.post("/api/status", statusController.index);
 
     app.use(router.routes()).use(router.allowedMethods());
 }

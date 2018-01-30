@@ -45,6 +45,8 @@
         "koa-compress": "^2.0.0",
         "koa-router": "^7.3.0",
         "moment": "^2.20.1",
-        "winston": "^3.0.0-rc1"
+        "sqlite3": "^3.1.13",
+        "winston": "^3.0.0-rc1",
+        "yz-open-sdk-nodejs": "^1.0.2"
     }
 }

@@ -57,6 +57,8 @@ typings/
 # dotenv environment variables file
 .env
 
-.envrc
+envrc
 
 dist/
+
+db/dev.db
