@@ -1,5 +1,5 @@
 import * as YZClient from "yz-open-sdk-nodejs";
-import * as Sign from "../../node_modules/yz-open-sdk-nodejs/Sign";
+import * as Token from "../../node_modules/yz-open-sdk-nodejs/Token";
 import * as crypto from "crypto";
 import axios from "axios";
 import * as https from "https";
@@ -9,9 +9,15 @@ import logger from "../utils/logger";
 import IYZPush from "../interface/IYZPush";
 import YZPushType from "../enum/YZPushType";
 import SqliteService from "./sqliteService";
+import YouzanTokenService from "./youzanTokenService";
 
 export default class YouzanPayService {
-    private yzClient = new YZClient(new Sign(YOUZAN_CLIENT_ID, YOUZAN_CLIENT_SECRET));
+    private async getYZClient() {
+        const tokenService = new YouzanTokenService();
+        const token = await tokenService.getToken();
+        logger.info(`Use token: ${token} to instantiate YZClient`);
+        return new YZClient(new Token(token));
+    }
 
     /**
      * 生成收款二维码
@@ -37,14 +43,20 @@ export default class YouzanPayService {
         };
 
         try {
-            const resp = await this.yzClient.invoke(
+            const client = await this.getYZClient();
+            const resp = await client.invoke(
                 "youzan.pay.qrcode.create",
                 "3.0.0",
                 "GET",
                 params,
                 undefined
             );
-            const data = JSON.parse(resp.response);
+            logger.info(`Service youzan.pay.qrcode.create invoke result: ${resp.body}`);
+            const result = JSON.parse(resp.body);
+            if (result.error_response) {
+                throw new Error(result.error_response.message);
+            }
+            const data = result.response;
             logger.info(`Generate qrcode: id: ${data.qr_id}, url: ${data.qr_url}`);
             return data;
         } catch (error) {
@@ -109,17 +121,11 @@ export default class YouzanPayService {
     private async fetchOrderQrId(tid: string) {
         try {
             logger.info(`Fetching detail for order: ${tid}`);
-
+            const client = await this.getYZClient();
             const params = {
                 tid
             };
-            const resp = await this.yzClient.invoke(
-                "youzan.trade.get",
-                "3.0.0",
-                "GET",
-                params,
-                undefined
-            );
+            const resp = client.invoke("youzan.trade.get", "3.0.0", "GET", params, undefined);
             const data = JSON.parse(resp.body);
             logger.info(`Fetched order detail: ${JSON.stringify(resp.body)}`);
 

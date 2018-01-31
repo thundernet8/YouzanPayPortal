@@ -8,13 +8,14 @@ import {
     SERVER_PORT,
     YOUZAN_CLIENT_ID,
     YOUZAN_CLIENT_SECRET,
+    YOUZAN_KDT_ID,
     SELF_SECRET,
     PUSH_API
 } from "./env";
 import router from "./router";
 import SqliteService from "./service/sqliteService";
 
-if (!YOUZAN_CLIENT_ID || !YOUZAN_CLIENT_SECRET || !SELF_SECRET || !PUSH_API) {
+if (!YOUZAN_CLIENT_ID || !YOUZAN_CLIENT_SECRET || !YOUZAN_KDT_ID || !SELF_SECRET || !PUSH_API) {
     throw new Error(`Please check envrc file and fill required fields`);
 }
 

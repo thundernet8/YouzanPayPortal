@@ -9,10 +9,6 @@ export default class SqliteService {
         new SqliteService().maybeInit();
     }
 
-    public constructor() {
-        this.maybeInit();
-    }
-
     private get dbFile() {
         let dbName = "";
 
