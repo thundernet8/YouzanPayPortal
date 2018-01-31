@@ -83,7 +83,7 @@ export default class YouzanPayService {
         }
 
         // 只处理支付消息
-        if (data.type !== YZPushType.TRADE_ORDER_STATE) {
+        if (data.type !== YZPushType.TRADE_ORDER_STATE && data.type !== YZPushType.TRADE) {
             logger.info(`Ignore message with type: ${data.type}`);
             return;
         }
