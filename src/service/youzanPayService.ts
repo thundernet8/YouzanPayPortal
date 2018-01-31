@@ -2,6 +2,7 @@ import * as YZClient from "yz-open-sdk-nodejs";
 import * as Token from "../../node_modules/yz-open-sdk-nodejs/Token";
 import * as crypto from "crypto";
 import axios from "axios";
+import * as moment from "moment";
 import * as https from "https";
 import * as qs from "querystring";
 import { YOUZAN_CLIENT_ID, YOUZAN_CLIENT_SECRET, SELF_SECRET, PUSH_API } from "../env";
@@ -107,7 +108,7 @@ export default class YouzanPayService {
             const record = await new SqliteService().findRecord(qrId);
 
             // 推送数据到原始订单系统
-            await this.pushOrder(record.ORDERID, payment, status);
+            await this.pushOrder(`${orderInfo.tid}-${qrId}`, record.ORDERID, payment, status);
         } catch (error) {
             logger.error(`Parse order info failed: ${error.message || error.toString()}`);
             return;
@@ -137,19 +138,29 @@ export default class YouzanPayService {
         }
     }
 
-    private async pushOrder(originOrderId: string, payment: number, status: string) {
+    private async pushOrder(
+        tradeNo: string,
+        originOrderId: string,
+        payment: number,
+        status: string
+    ) {
         if (!originOrderId) {
             return false;
         }
-        const sig = [originOrderId, payment.toString(), status, SELF_SECRET].join("|");
+        const time = (moment.now().valueOf() / 1000).toFixed(0);
+        const sig = [time, tradeNo, originOrderId, payment.toString(), status, SELF_SECRET].join(
+            "|"
+        );
         const data = {
+            tradeNo,
             orderId: originOrderId,
             payment,
             status,
             sign: crypto
                 .createHash("md5")
                 .update(sig, "utf8")
-                .digest("hex")
+                .digest("hex"),
+            time
         };
 
         try {
