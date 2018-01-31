@@ -131,25 +131,25 @@ export default class YouzanPayService {
      * 通过订单号查询订单详情并返回详情内的qr_id
      * @param tid 有赞订单号
      */
-    private async fetchOrderQrId(tid: string) {
-        try {
-            logger.info(`Fetching detail for order: ${tid}`);
-            const client = await this.getYZClient();
-            const params = {
-                tid
-            };
-            const resp = client.invoke("youzan.trade.get", "3.0.0", "GET", params, undefined);
-            logger.info(`Fetched order detail resp: ${resp}`);
-            const data = JSON.parse(resp.body);
-            logger.info(`Fetched order detail: ${JSON.stringify(resp.body)}`);
+    // private async fetchOrderQrId(tid: string) {
+    //     try {
+    //         logger.info(`Fetching detail for order: ${tid}`);
+    //         const client = await this.getYZClient();
+    //         const params = {
+    //             tid
+    //         };
+    //         const resp = client.invoke("youzan.trade.get", "3.0.0", "GET", params, undefined);
+    //         logger.info(`Fetched order detail resp: ${resp}`);
+    //         const data = JSON.parse(resp.body);
+    //         logger.info(`Fetched order detail: ${JSON.stringify(resp.body)}`);
 
-            const qrId = data.response.trade.qr_id;
-            return qrId as number;
-        } catch (error) {
-            logger.error(`Fetch order detail failed: ${error.message || error.toString()}`);
-            return 0;
-        }
-    }
+    //         const qrId = data.response.trade.qr_id;
+    //         return qrId as number;
+    //     } catch (error) {
+    //         logger.error(`Fetch order detail failed: ${error.message || error.toString()}`);
+    //         return 0;
+    //     }
+    // }
 
     private async pushOrder(
         tradeNo: string,
