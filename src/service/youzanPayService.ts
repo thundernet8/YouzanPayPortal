@@ -96,8 +96,20 @@ export default class YouzanPayService {
 
         try {
             logger.info(`Parsed order info: ${decodeURI(data.msg)}`);
-            const orderInfo = JSON.parse(decodeURI(data.msg));
-            const qrId = await this.fetchOrderQrId(orderInfo.tid);
+            const orderInfo = JSON.parse(decodeURI(data.msg)).trade;
+
+            // 💩文档 这一步不需要了
+            // const qrId = await this.fetchOrderQrId(orderInfo.tid);
+            // if (!qrId) {
+            //     return;
+            // }
+
+            const qrId = Number(orderInfo.qr_id);
+
+            if (!qrId) {
+                return;
+            }
+
             const payment = parseInt((orderInfo.payment * 100).toFixed(0), 10);
             const status = orderInfo.status || data.status;
 
@@ -127,6 +139,7 @@ export default class YouzanPayService {
                 tid
             };
             const resp = client.invoke("youzan.trade.get", "3.0.0", "GET", params, undefined);
+            logger.info(`Fetched order detail resp: ${resp}`);
             const data = JSON.parse(resp.body);
             logger.info(`Fetched order detail: ${JSON.stringify(resp.body)}`);
 
