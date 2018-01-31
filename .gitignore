@@ -57,3 +57,10 @@ typings/
 # dotenv environment variables file
 .env
 
+envrc
+
+dist/
+
+db/dev.db
+db/prod.db
+db/test.db

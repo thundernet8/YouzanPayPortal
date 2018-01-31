@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "strictNullChecks": true,
+        "moduleResolution": "node",
+        "allowSyntheticDefaultImports": true,
+        // 支持装饰器
+        "experimentalDecorators": true,
+        // 装饰器元数据
+        "emitDecoratorMetadata": true,
+        "noUnusedParameters": true,
+        "noUnusedLocals": true,
+        "target": "es5",
+        "lib": ["es7", "es2015"],
+        "typeRoots": ["node_modules/@types", "typings"],
+        "baseUrl": "./src",
+        "outDir": "./dist",
+        "allowJs": false
+    },
+    "exclude": ["node_modules", "dist", "**/*.spec.ts?"]
+}
