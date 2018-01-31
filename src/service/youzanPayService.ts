@@ -59,6 +59,9 @@ export default class YouzanPayService {
             }
             const data = result.response;
             logger.info(`Generate qrcode: id: ${data.qr_id}, url: ${data.qr_url}`);
+
+            await new SqliteService().insertRecord(originOrderId, data.qr_id);
+
             return data;
         } catch (error) {
             logger.error(error.message || error.toString());
@@ -83,7 +86,7 @@ export default class YouzanPayService {
         }
 
         // 只处理支付消息
-        if (data.type !== YZPushType.TRADE_ORDER_STATE && data.type !== YZPushType.TRADE) {
+        if (data.type !== YZPushType.TRADE_ORDER_STATE) {
             logger.info(`Ignore message with type: ${data.type}`);
             return;
         }
@@ -97,7 +100,12 @@ export default class YouzanPayService {
         try {
             logger.info(`Parsed order info: ${decodeURI(data.msg)}`);
             const orderInfo = JSON.parse(decodeURI(data.msg));
+
             const qrId = await this.fetchOrderQrId(orderInfo.tid);
+            if (!qrId) {
+                return;
+            }
+
             const payment = parseInt((orderInfo.payment * 100).toFixed(0), 10);
             const status = orderInfo.status || data.status;
 
@@ -106,6 +114,10 @@ export default class YouzanPayService {
 
             // 在本地数据库查询对接的原始订单号
             const record = await new SqliteService().findRecord(qrId);
+
+            if (!record) {
+                return;
+            }
 
             // 推送数据到原始订单系统
             await this.pushOrder(`${orderInfo.tid}-${qrId}`, record.ORDERID, payment, status);
@@ -126,7 +138,8 @@ export default class YouzanPayService {
             const params = {
                 tid
             };
-            const resp = client.invoke("youzan.trade.get", "3.0.0", "GET", params, undefined);
+            const resp = await client.invoke("youzan.trade.get", "3.0.0", "GET", params, undefined);
+            logger.info(`Fetched order detail resp: ${resp}`);
             const data = JSON.parse(resp.body);
             logger.info(`Fetched order detail: ${JSON.stringify(resp.body)}`);
 
@@ -167,7 +180,7 @@ export default class YouzanPayService {
             logger.info(`Trying push order to ${PUSH_API}, data: ${JSON.stringify(data)}`);
             const resp = await axios
                 .create({
-                    timeout: 10000,
+                    timeout: 30000,
                     withCredentials: false,
                     httpsAgent: new https.Agent({
                         rejectUnauthorized: false
@@ -184,9 +197,9 @@ export default class YouzanPayService {
                 );
                 return false;
             } else {
-                logger.info(
-                    `Push order info to ${PUSH_API} successfully, response ${JSON.stringify(resp)}`
-                );
+                logger.info(`Push order info to ${PUSH_API} successfully, response ${resp.data}`);
+
+                // TODO record success push to db
                 return true;
             }
 
