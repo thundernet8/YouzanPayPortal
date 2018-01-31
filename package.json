@@ -8,7 +8,11 @@
     "license": "MIT",
     "scripts": {
         "build": "rimraf dist && tsc",
-        "start": "mkdirp logs && node dist/app.js",
+        "start":
+            "mkdirp logs && npm run build && cross-env NODE_ENV=production forever start dist/app.js",
+        "stop": "forever stop dist/app.js",
+        "start:dev": "mkdirp logs && cross-env NODE_ENV=development node dist/app.js",
+        "list": "forever list",
         "lint": "npm run lint:ts",
         "lint:ts": "tslint -e node_modules typings -c .tslintrc.json src/**/*.tsx",
         "lint-staged": "lint-staged",
@@ -16,11 +20,7 @@
         "format": "prettier --write"
     },
     "lint-staged": {
-        "src/**/*.{ts,tsx}": [
-            "format",
-            "lint-staged:ts",
-            "git add"
-        ]
+        "src/**/*.{ts,tsx}": ["format", "lint-staged:ts", "git add"]
     },
     "pre-commit": "lint-staged",
     "devDependencies": {
