@@ -3,7 +3,7 @@ import * as path from "path";
 import * as moment from "moment";
 
 function getLogger() {
-    const daySuffix = moment().format("YYY-MM-DD");
+    const daySuffix = moment().format("YYYY-MM-DD");
     const errorLogFile = path.join(process.cwd(), `./logs/error-${daySuffix}.log`);
     const warnLogFile = path.join(process.cwd(), `./logs/warn-${daySuffix}.log`);
     const infoLogFile = path.join(process.cwd(), `./logs/info-${daySuffix}.log`);

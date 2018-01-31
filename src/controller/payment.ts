@@ -8,7 +8,7 @@ export default class PaymentController {
     public async genPayQr(ctx, _next) {
         const payService = new YouzanPayService();
         try {
-            const { name, price, order_id } = ctx.body;
+            const { name, price, order_id } = ctx.request.body;
             const result = payService.createQrCode(name, price, order_id);
             if (!result) {
                 throw new Error("Create payment qrcode failed");
