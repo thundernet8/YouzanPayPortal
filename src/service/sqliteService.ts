@@ -56,8 +56,8 @@ export default class SqliteService {
         const db = this.getDb();
         return new Promise<number>((resolve, reject) => {
             db.serialize(function() {
-                const stmt = db.prepare("INSERT INTO orders VALUES (?, ?, ?)");
-                stmt.run([null, orderId, qrId], function(error, lastId) {
+                const stmt = db.prepare("INSERT INTO orders VALUES (?, ?, ?, ?, ?)");
+                stmt.run([null, orderId, qrId, 0, ""], function(error, lastId) {
                     if (error) {
                         logger.error(error.message || error.toString());
                         stmt.finalize();
@@ -85,7 +85,7 @@ export default class SqliteService {
         const db = this.getDb();
         return new Promise<any>((resolve, reject) => {
             db.serialize(function() {
-                const stmt = db.prepare("UPDATE orders SET PAYMENT=?, STATUS='?' WHERE QRID=?");
+                const stmt = db.prepare("UPDATE orders SET PAYMENT=?, STATUS=? WHERE QRID=?");
                 stmt.run([payment, status, qrId], function(error, result) {
                     if (error) {
                         logger.error(error.message || error.toString());

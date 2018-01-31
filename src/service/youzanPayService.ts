@@ -59,6 +59,9 @@ export default class YouzanPayService {
             }
             const data = result.response;
             logger.info(`Generate qrcode: id: ${data.qr_id}, url: ${data.qr_url}`);
+
+            await new SqliteService().insertRecord(originOrderId, data.qr_id);
+
             return data;
         } catch (error) {
             logger.error(error.message || error.toString());
@@ -83,7 +86,7 @@ export default class YouzanPayService {
         }
 
         // 只处理支付消息
-        if (data.type !== YZPushType.TRADE_ORDER_STATE && data.type !== YZPushType.TRADE) {
+        if (data.type !== YZPushType.TRADE_ORDER_STATE) {
             logger.info(`Ignore message with type: ${data.type}`);
             return;
         }
@@ -96,16 +99,9 @@ export default class YouzanPayService {
 
         try {
             logger.info(`Parsed order info: ${decodeURI(data.msg)}`);
-            const orderInfo = JSON.parse(decodeURI(data.msg)).trade;
+            const orderInfo = JSON.parse(decodeURI(data.msg));
 
-            // 💩文档 这一步不需要了
-            // const qrId = await this.fetchOrderQrId(orderInfo.tid);
-            // if (!qrId) {
-            //     return;
-            // }
-
-            const qrId = Number(orderInfo.qr_id);
-
+            const qrId = await this.fetchOrderQrId(orderInfo.tid);
             if (!qrId) {
                 return;
             }
@@ -119,6 +115,10 @@ export default class YouzanPayService {
             // 在本地数据库查询对接的原始订单号
             const record = await new SqliteService().findRecord(qrId);
 
+            if (!record) {
+                return;
+            }
+
             // 推送数据到原始订单系统
             await this.pushOrder(`${orderInfo.tid}-${qrId}`, record.ORDERID, payment, status);
         } catch (error) {
@@ -131,25 +131,25 @@ export default class YouzanPayService {
      * 通过订单号查询订单详情并返回详情内的qr_id
      * @param tid 有赞订单号
      */
-    // private async fetchOrderQrId(tid: string) {
-    //     try {
-    //         logger.info(`Fetching detail for order: ${tid}`);
-    //         const client = await this.getYZClient();
-    //         const params = {
-    //             tid
-    //         };
-    //         const resp = client.invoke("youzan.trade.get", "3.0.0", "GET", params, undefined);
-    //         logger.info(`Fetched order detail resp: ${resp}`);
-    //         const data = JSON.parse(resp.body);
-    //         logger.info(`Fetched order detail: ${JSON.stringify(resp.body)}`);
+    private async fetchOrderQrId(tid: string) {
+        try {
+            logger.info(`Fetching detail for order: ${tid}`);
+            const client = await this.getYZClient();
+            const params = {
+                tid
+            };
+            const resp = await client.invoke("youzan.trade.get", "3.0.0", "GET", params, undefined);
+            logger.info(`Fetched order detail resp: ${resp}`);
+            const data = JSON.parse(resp.body);
+            logger.info(`Fetched order detail: ${JSON.stringify(resp.body)}`);
 
-    //         const qrId = data.response.trade.qr_id;
-    //         return qrId as number;
-    //     } catch (error) {
-    //         logger.error(`Fetch order detail failed: ${error.message || error.toString()}`);
-    //         return 0;
-    //     }
-    // }
+            const qrId = data.response.trade.qr_id;
+            return qrId as number;
+        } catch (error) {
+            logger.error(`Fetch order detail failed: ${error.message || error.toString()}`);
+            return 0;
+        }
+    }
 
     private async pushOrder(
         tradeNo: string,
@@ -180,7 +180,7 @@ export default class YouzanPayService {
             logger.info(`Trying push order to ${PUSH_API}, data: ${JSON.stringify(data)}`);
             const resp = await axios
                 .create({
-                    timeout: 10000,
+                    timeout: 30000,
                     withCredentials: false,
                     httpsAgent: new https.Agent({
                         rejectUnauthorized: false
@@ -197,9 +197,9 @@ export default class YouzanPayService {
                 );
                 return false;
             } else {
-                logger.info(
-                    `Push order info to ${PUSH_API} successfully, response ${JSON.stringify(resp)}`
-                );
+                logger.info(`Push order info to ${PUSH_API} successfully, response ${resp.data}`);
+
+                // TODO record success push to db
                 return true;
             }
 
