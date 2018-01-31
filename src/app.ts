@@ -3,8 +3,20 @@ import * as cors from "@koa/cors";
 import * as compress from "koa-compress";
 import * as bodyParser from "koa-bodyparser";
 import logger from "./utils/logger";
-import { SERVER_HOST, SERVER_PORT } from "./env";
+import {
+    SERVER_HOST,
+    SERVER_PORT,
+    YOUZAN_CLIENT_ID,
+    YOUZAN_CLIENT_SECRET,
+    SELF_SECRET,
+    PUSH_API
+} from "./env";
 import router from "./router";
+import SqliteService from "./service/sqliteService";
+
+if (!YOUZAN_CLIENT_ID || !YOUZAN_CLIENT_SECRET || !SELF_SECRET || !PUSH_API) {
+    throw new Error(`Please check envrc file and fill required fields`);
+}
 
 const app = new Koa();
 
@@ -37,5 +49,6 @@ app.on("error", error => {
 });
 
 app.listen(SERVER_PORT, SERVER_HOST, () => {
+    SqliteService.init();
     logger.info(`Server Is Listening at http://${SERVER_HOST}:${SERVER_PORT}`);
 });

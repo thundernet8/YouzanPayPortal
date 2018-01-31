@@ -5,8 +5,12 @@ import logger from "../utils/logger";
 import IOrder from "../interface/IOrder";
 
 export default class SqliteService {
+    public static init() {
+        new SqliteService().maybeInit();
+    }
+
     public constructor() {
-        this.init();
+        this.maybeInit();
     }
 
     private get dbFile() {
@@ -35,14 +39,14 @@ export default class SqliteService {
         return new Database(fullFilepath);
     }
 
-    private init() {
+    private maybeInit() {
         const fullFilepath = this.dbFile;
         if (!fs.existsSync(fullFilepath)) {
             logger.info(`DB file is not existed on path ${fullFilepath}, trying to add a new one.`);
             const db = this.getDb();
             db.serialize(function() {
                 db.run(
-                    "CREATE TABLE orders(ID INTEGER PRIMARY KEY  AUTOINCREMENT, ORDERID CHAR(50) NOT NULL, QRID INTEGER NOT NULL UNIQUE)"
+                    "CREATE TABLE orders(ID INTEGER PRIMARY KEY  AUTOINCREMENT, ORDERID CHAR(50), QRID INTEGER NOT NULL UNIQUE, PAYMENT INTEGER, STATUS CHAR(50))"
                 );
             });
 
@@ -68,6 +72,37 @@ export default class SqliteService {
                         stmt.finalize();
                         db.close();
                         resolve(lastId);
+                    }
+                });
+            });
+        });
+    }
+
+    /**
+     * 更新订单将付款信息订单状态保存以便重试推送
+     * @param qrId
+     * @param payment
+     * @param status
+     */
+    public updateRecord(qrId: number, payment: number, status: string) {
+        logger.info(`Update record QRID: ${qrId}, PAYMENT: ${payment}, STATUS: ${status}`);
+        const db = this.getDb();
+        return new Promise<any>((resolve, reject) => {
+            db.serialize(function() {
+                const stmt = db.prepare("UPDATE orders SET PAYMENT=?, STATUS='?' WHERE QRID=?");
+                stmt.run([payment, status, qrId], function(error, result) {
+                    if (error) {
+                        logger.error(error.message || error.toString());
+                        stmt.finalize();
+                        db.close();
+                        reject(error);
+                    } else {
+                        logger.info(
+                            `Query result: update row with QRID: ${qrId} and return result: ${result}`
+                        );
+                        stmt.finalize();
+                        db.close();
+                        resolve(result);
                     }
                 });
             });

@@ -12,3 +12,7 @@ export const SERVER_PORT = IS_PROD ? 8601 : 8601;
 // Youzan
 export const YOUZAN_CLIENT_ID = process.env.YOUZANYUN_CLIENT_ID || "";
 export const YOUZAN_CLIENT_SECRET = process.env.YOUZANYUN_CLIENT_SECRET || "";
+export const SELF_SECRET = process.env.SELF_SECRET || "";
+
+// 推送目标服务器地址
+export const PUSH_API = process.env.PUSH_API || "";
