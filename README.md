@@ -43,14 +43,18 @@
 
 ### 本服务
 
-* 启动服务配置环境参数文件`envrc`，复制`envrc.sample`为`envrc`
+* 启动服务配置环境参数，复制`envrc.sample`为`envrc`并填写
 
 其中:
 
 `YOUZANYUN_CLIENT_ID`: 有赞云应用的 client_id
+
 `YOUZANYUN_CLIENT_SECRET`: 有赞云应用的 client_secret
+
 `YOUZAN_KDT_ID`: 有赞云应用绑定的微小店 ID
+
 `SELF_SECRET`: 自有订单系统接收本服务推送数据的加盐 secret
+
 `PUSH_API`: 自有订单系统接收本服务推送数据的地址
 
 ```
