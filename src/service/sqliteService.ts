@@ -109,7 +109,7 @@ export default class SqliteService {
         logger.info(`Query record by: QRID: ${qrId}`);
         const db = this.getDb();
         return new Promise<IOrder>((resolve, reject) => {
-            db.get("SELECT * FROM orders", function(error, row) {
+            db.get(`SELECT * FROM orders WHERE QRID=${qrId}`, function(error, row) {
                 if (error) {
                     logger.error(error.message || error.toString());
                     db.close();
