@@ -4,12 +4,12 @@
 
 **利用有赞云和有赞微小店实现个人收款解决方案 .**
 
-[![GitHub issues](https://img.shields.io/github/issues/thundernet8/YouzanQrPayPortal.svg)](https://github.com/thundernet8/YouzanQrPayPortal/issues)
-[![GitHub forks](https://img.shields.io/github/forks/thundernet8/YouzanQrPayPortal.svg)](https://github.com/thundernet8/YouzanQrPayPortal/network)
-[![GitHub stars](https://img.shields.io/github/stars/thundernet8/YouzanQrPayPortal.svg)](https://github.com/thundernet8/YouzanQrPayPortal/stargazers)
-[![dependency status](https://img.shields.io/david/thundernet8/YouzanQrPayPortal.svg?maxAge=3600&style=flat)](https://david-dm.org/thundernet8/YouzanQrPayPortal)
-[![Build Status](https://travis-ci.org/thundernet8/YouzanQrPayPortal.svg?branch=master)](https://travis-ci.org/thundernet8/YouzanQrPayPortal)
-[![GitHub license](https://img.shields.io/github/license/thundernet8/YouzanQrPayPortal.svg)](https://github.com/thundernet8/YouzanQrPayPortal/blob/master/LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues/thundernet8/YouzanPayPortal.svg)](https://github.com/thundernet8/YouzanPayPortal/issues)
+[![GitHub forks](https://img.shields.io/github/forks/thundernet8/YouzanPayPortal.svg)](https://github.com/thundernet8/YouzanPayPortal/network)
+[![GitHub stars](https://img.shields.io/github/stars/thundernet8/YouzanPayPortal.svg)](https://github.com/thundernet8/YouzanPayPortal/stargazers)
+[![dependency status](https://img.shields.io/david/thundernet8/YouzanPayPortal.svg?maxAge=3600&style=flat)](https://david-dm.org/thundernet8/YouzanPayPortal)
+[![Build Status](https://travis-ci.org/thundernet8/YouzanPayPortal.svg?branch=master)](https://travis-ci.org/thundernet8/YouzanPayPortal)
+[![GitHub license](https://img.shields.io/github/license/thundernet8/YouzanPayPortal.svg)](https://github.com/thundernet8/YouzanPayPortal/blob/master/LICENSE)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
 </div>
