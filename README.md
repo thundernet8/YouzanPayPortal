@@ -21,13 +21,13 @@
 利用有赞云和有赞微小店实现个人收款解决方案, 提供如下两个服务:
 
 * 代理简化生成收款二维码的 API，支持微信支付宝扫描付款
-* 订单状态通知到指定的服务器
+* 接收有赞云的交易消息推送并处理(需要二次请求交易详情)，简化订单状态通知到指定的服务器
 
 核心原理是提供了一个支付中转层，将自有商户订单与有赞云的订单绑定起来，实现支付状态更新
 
 为什么做成单独的服务:
 
-* 基于 HTTP 协议可以方便对接任何系统
+* 方便对接任何系统
 * 状态推送可以更灵活的自定义
 * 单独服务模式维护减少对原有系统影响
 
@@ -39,7 +39,7 @@
 
 * 创建[有赞微小店](https://h5.youzan.com/v2/index/wxdpc) 并扫码下载相应 APP 便于后续管理资金，注意这个小店在有赞后台看不到，只有 APP 可见
 
-* 应用授权-有赞云控制台创建自用型应用并授权刚创建的店铺，在[推送服务]设置中设置推送网址*http://www.example.com/api/status*
+* 应用授权-有赞云控制台创建自用型应用并授权刚创建的店铺，在[推送服务]设置中设置推送网址*http://www.example.com/api/status* , 同时勾选下方的交易消息选项。
 
 ### 本服务
 
@@ -72,7 +72,14 @@ npm run stop // 停止服务
     * 接口地址示例: `http://www.example.com/api/payment/qrcode`
     * 调用方法 `POST application/json`
     * 请求数据 `name`: 商品名, `price`: 价格(分), `order_id`: 自有系统的订单号
-    * 返回数据 1. 正常情况 `qr_id`: 二维码 ID; `qr_url`: 有赞系统内支付地址(不推荐使用，需要付费者注册有赞); `qr_code`: Base64 图片数据，可直接作为 img 的 src 使用 2. 异常情况 `null`
+    * 返回数据 
+        * 1. 正常情况 `qr_id`: 二维码 ID; `qr_url`: 有赞系统内支付地址(不推荐使用，需要付费者注册有赞); `qr_code`: Base64 图片数据，可直接作为 img 的 src 使用 
+        * 2. 异常情况 `null`
+
+
+    ```curl
+    curl -X POST -H 'Content-type: application/json' --data '{"name":"test name", "price": 1, "order_id": "your orderid"}' http://www.example.com/api/payment/qrcode
+    ```
 
 * 接收状态推送自有订单系统提供一个`PUSH_API`地址接收数据推送，数据格式如下:
 

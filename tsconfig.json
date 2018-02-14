@@ -10,7 +10,7 @@
         "noUnusedParameters": true,
         "noUnusedLocals": true,
         "target": "es5",
-        "lib": ["es7", "es2015"],
+        "lib": ["es6", "es7"],
         "typeRoots": ["node_modules/@types", "typings"],
         "baseUrl": "./src",
         "outDir": "./dist",
