@@ -48,5 +48,8 @@
         "sqlite3": "^3.1.13",
         "winston": "^3.0.0-rc1",
         "yz-open-sdk-nodejs": "^1.0.2"
+    },
+    "engines": {
+        "node": ">=8.0.0"
     }
 }
