@@ -2,7 +2,7 @@ import * as Koa from "koa";
 import * as cors from "@koa/cors";
 import * as compress from "koa-compress";
 import * as bodyParser from "koa-bodyparser";
-import logger from "./utils/logger";
+import getLogger from "./utils/logger";
 import {
     SERVER_HOST,
     SERVER_PORT,
@@ -46,10 +46,10 @@ app.use(cors({ credentials: true }));
 router(app);
 
 app.on("error", error => {
-    logger.error(error.message || error.toString());
+    getLogger().error(error.message || error.toString());
 });
 
 app.listen(SERVER_PORT, SERVER_HOST, () => {
     SqliteService.init();
-    logger.info(`Server Is Listening at http://${SERVER_HOST}:${SERVER_PORT}`);
+    getLogger().info(`Server Is Listening at http://${SERVER_HOST}:${SERVER_PORT}`);
 });

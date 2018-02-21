@@ -1,11 +1,13 @@
 import axios from "axios";
 import * as https from "https";
 import * as qs from "querystring";
-import logger from "../utils/logger";
+import getLogger from "../utils/logger";
 import * as moment from "moment";
 import { YOUZAN_CLIENT_ID, YOUZAN_CLIENT_SECRET, YOUZAN_KDT_ID } from "../env";
 
 export default class YouzanTokenService {
+    private logger = getLogger();
+
     /**
      * Memory cache
      */
@@ -23,7 +25,7 @@ export default class YouzanTokenService {
         if (cache) {
             const { token, expiry } = cache;
             if (token && expiry - moment.now().valueOf() / 1000 > 10 * 60) {
-                logger.info(`Get token from cache: ${token}`);
+                this.logger.info(`Get token from cache: ${token}`);
                 return token;
             }
         }
@@ -46,10 +48,12 @@ export default class YouzanTokenService {
         };
 
         try {
-            logger.info(`Trying to get access_token with request data: ${JSON.stringify(data)}`);
+            this.logger.info(
+                `Trying to get access_token with request data: ${JSON.stringify(data)}`
+            );
             const resp = await ax.post("https://open.youzan.com/oauth/token", qs.stringify(data));
             if (resp.status !== 200) {
-                logger.error(
+                this.logger.error(
                     `Get access_token request failed with status: ${resp.status} and data: ${
                         resp.data
                     }`
@@ -57,14 +61,16 @@ export default class YouzanTokenService {
                 throw new Error("Get access_token failed");
             }
 
-            logger.info(`Get access_token request successfully data: ${JSON.stringify(resp.data)}`);
+            this.logger.info(
+                `Get access_token request successfully data: ${JSON.stringify(resp.data)}`
+            );
 
             const { access_token, expires_in } = resp.data;
-            logger.info(`Got access_token: ${access_token}, expires_in: ${expires_in}`);
+            this.logger.info(`Got access_token: ${access_token}, expires_in: ${expires_in}`);
             this.setToken(access_token, expires_in);
             return access_token as string;
         } catch (error) {
-            logger.error(
+            this.logger.error(
                 `Get access_token request failed with message: ${error.message || error.toString()}`
             );
             throw error;
