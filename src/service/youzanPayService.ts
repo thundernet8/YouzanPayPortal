@@ -103,7 +103,7 @@ export default class YouzanPayService {
             this.logger.info(`Parsed order info: ${decodeURI(data.msg)}`);
             const orderInfo = JSON.parse(decodeURI(data.msg));
 
-            const qrId = await this.fetchOrderQrId(orderInfo.tid);
+            const { qrId, uuid } = await this.fetchOrderQrId(orderInfo.tid);
             if (!qrId) {
                 return;
             }
@@ -122,7 +122,7 @@ export default class YouzanPayService {
             }
 
             // 推送数据到原始订单系统
-            await this.pushOrder(`${orderInfo.tid}-${qrId}`, record.ORDERID, payment, status);
+            await this.pushOrder(`${orderInfo.tid}-${qrId}`, record.ORDERID, payment, status, uuid);
         } catch (error) {
             this.logger.error(`Parse order info failed: ${error.message || error.toString()}`);
             return;
@@ -146,10 +146,19 @@ export default class YouzanPayService {
             this.logger.info(`Fetched order detail: ${JSON.stringify(resp.body)}`);
 
             const qrId = data.response.trade.qr_id;
-            return qrId as number;
+            const fansInfo = data.response.trade.fans_info;
+            const { fans_id, buyer_id, fans_weixin_openid } = fansInfo;
+            const uuid = buyer_id || fans_weixin_openid || fans_id;
+            return {
+                qrId,
+                uuid
+            };
         } catch (error) {
             this.logger.error(`Fetch order detail failed: ${error.message || error.toString()}`);
-            return 0;
+            return {
+                qrId: 0,
+                uuid: ""
+            };
         }
     }
 
@@ -157,7 +166,8 @@ export default class YouzanPayService {
         tradeNo: string,
         originOrderId: string,
         payment: number,
-        status: string
+        status: string,
+        uuid: string
     ) {
         if (!originOrderId) {
             return false;
@@ -171,6 +181,7 @@ export default class YouzanPayService {
             orderId: originOrderId,
             payment,
             status,
+            uuid,
             sign: crypto
                 .createHash("md5")
                 .update(sig, "utf8")
