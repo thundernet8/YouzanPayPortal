@@ -1,7 +1,9 @@
 import YouzanPayService from "../service/youzanPayService";
-import logger from "../utils/logger";
+import getLogger from "../utils/logger";
 
 export default class PaymentController {
+    private logger = getLogger();
+
     /**
      * 请求生成收款二维码
      */
@@ -17,7 +19,7 @@ export default class PaymentController {
             ctx.type = "application/json";
             ctx.body = JSON.stringify(result);
         } catch (error) {
-            logger.error(error.message || error.toString());
+            this.logger.error(error.message || error.toString());
             ctx.status = 500;
             ctx.body = error.message || error.toString();
         }

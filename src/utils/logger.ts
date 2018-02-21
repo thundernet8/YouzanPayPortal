@@ -31,4 +31,4 @@ function getLogger() {
     return logger;
 }
 
-export default getLogger();
+export default getLogger;
