@@ -190,33 +190,48 @@ export default class YouzanPayService {
         };
 
         try {
-            this.logger.info(`Trying push order to ${PUSH_API}, data: ${JSON.stringify(data)}`);
-            const resp = await axios
-                .create({
-                    timeout: 30000,
-                    withCredentials: false,
-                    httpsAgent: new https.Agent({
-                        rejectUnauthorized: false
-                    }),
-                    headers: {
-                        "Content-type": "application/x-www-form-urlencoded"
-                    }
-                })
-                .post(PUSH_API, qs.stringify(data));
-
-            if (resp.status !== 200) {
-                this.logger.error(
-                    `Push order info to ${PUSH_API} with wrong response status ${resp.status}`
-                );
-                return false;
-            } else {
+            const pushApis = PUSH_API.split(";");
+            const promises: Promise<boolean>[] = [];
+            for (let i = 0; i < pushApis.length; i++) {
                 this.logger.info(
-                    `Push order info to ${PUSH_API} successfully, response ${resp.data}`
+                    `Trying push order to ${pushApis[i]}, data: ${JSON.stringify(data)}`
                 );
+                promises.push(
+                    axios
+                        .create({
+                            timeout: 30000,
+                            withCredentials: false,
+                            httpsAgent: new https.Agent({
+                                rejectUnauthorized: false
+                            }),
+                            headers: {
+                                "Content-type": "application/x-www-form-urlencoded"
+                            }
+                        })
+                        .post(pushApis[i], qs.stringify(data))
+                        .then(resp => {
+                            if (resp.status !== 200) {
+                                this.logger.error(
+                                    `Push order info to ${pushApis[i]} with wrong response status ${
+                                        resp.status
+                                    }`
+                                );
+                                return false;
+                            } else {
+                                this.logger.info(
+                                    `Push order info to ${pushApis[i]} successfully, response ${
+                                        resp.data
+                                    }`
+                                );
 
-                // TODO record success push to db
-                return true;
+                                // TODO record success push to db
+                                return true;
+                            }
+                        })
+                );
             }
+
+            await Promise.all(promises);
 
             // TODO retry push
         } catch (error) {

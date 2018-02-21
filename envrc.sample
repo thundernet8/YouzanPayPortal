@@ -2,4 +2,4 @@ YOUZANYUN_CLIENT_ID=
 YOUZANYUN_CLIENT_SECRET=
 YOUZAN_KDT_ID=
 SELF_SECRET=
-PUSH_API=
+PUSH_API=http://www.example1.com;http://www.example2.com
