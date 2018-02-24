@@ -2,7 +2,9 @@ import YouzanPayService from "../service/youzanPayService";
 import getLogger from "../utils/logger";
 
 export default class StatusController {
-    private logger = getLogger();
+    private get logger() {
+        return getLogger();
+    }
 
     /**
      * 接收来自有赞推送的消息

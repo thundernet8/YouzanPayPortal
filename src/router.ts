@@ -7,9 +7,9 @@ export default function(app) {
     const payMentontroller = new PaymentController();
     const statusController = new StatusController();
 
-    router.post("/api/payment/qrcode", payMentontroller.genPayQr);
+    router.post("/api/payment/qrcode", payMentontroller.genPayQr.bind(payMentontroller));
 
-    router.post("/api/status", statusController.index);
+    router.post("/api/status", statusController.index.bind(statusController));
 
     app.use(router.routes()).use(router.allowedMethods());
 }
