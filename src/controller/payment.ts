@@ -2,7 +2,9 @@ import YouzanPayService from "../service/youzanPayService";
 import getLogger from "../utils/logger";
 
 export default class PaymentController {
-    private logger = getLogger();
+    private get logger() {
+        return getLogger();
+    }
 
     /**
      * 请求生成收款二维码
