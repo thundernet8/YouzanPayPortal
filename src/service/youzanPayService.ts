@@ -13,7 +13,9 @@ import SqliteService from "./sqliteService";
 import YouzanTokenService from "./youzanTokenService";
 
 export default class YouzanPayService {
-    private logger = getLogger();
+    private get logger() {
+        return getLogger();
+    }
 
     private async getYZClient() {
         const tokenService = new YouzanTokenService();
