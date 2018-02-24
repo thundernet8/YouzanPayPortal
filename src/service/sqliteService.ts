@@ -5,7 +5,9 @@ import getLogger from "../utils/logger";
 import IOrder from "../interface/IOrder";
 
 export default class SqliteService {
-    private logger = getLogger();
+    private get logger() {
+        return getLogger();
+    }
 
     public static init() {
         new SqliteService().maybeInit();
@@ -58,17 +60,18 @@ export default class SqliteService {
     public insertRecord(orderId: string, qrId: number) {
         this.logger.info(`Insert record ORDERID: ${orderId}, QRID: ${qrId}`);
         const db = this.getDb();
+        const logger = this.logger;
         return new Promise<number>((resolve, reject) => {
             db.serialize(function() {
                 const stmt = db.prepare("INSERT INTO orders VALUES (?, ?, ?, ?, ?)");
                 stmt.run([null, orderId, qrId, 0, ""], function(error, lastId) {
                     if (error) {
-                        this.logger.error(error.message || error.toString());
+                        logger.error(error.message || error.toString());
                         stmt.finalize();
                         db.close();
                         reject(error);
                     } else {
-                        this.logger.info(`Query result: insert row with ID: ${lastId}`);
+                        logger.info(`Query result: insert row with ID: ${lastId}`);
                         stmt.finalize();
                         db.close();
                         resolve(lastId);
@@ -87,17 +90,18 @@ export default class SqliteService {
     public updateRecord(qrId: number, payment: number, status: string) {
         this.logger.info(`Update record QRID: ${qrId}, PAYMENT: ${payment}, STATUS: ${status}`);
         const db = this.getDb();
+        const logger = this.logger;
         return new Promise<any>((resolve, reject) => {
             db.serialize(function() {
                 const stmt = db.prepare("UPDATE orders SET PAYMENT=?, STATUS=? WHERE QRID=?");
                 stmt.run([payment, status, qrId], function(error, result) {
                     if (error) {
-                        this.logger.error(error.message || error.toString());
+                        logger.error(error.message || error.toString());
                         stmt.finalize();
                         db.close();
                         reject(error);
                     } else {
-                        this.logger.info(
+                        logger.info(
                             `Query result: update row with QRID: ${qrId} and return result: ${result}`
                         );
                         stmt.finalize();
@@ -112,14 +116,15 @@ export default class SqliteService {
     public findRecord(qrId: number) {
         this.logger.info(`Query record by: QRID: ${qrId}`);
         const db = this.getDb();
+        const logger = this.logger;
         return new Promise<IOrder>((resolve, reject) => {
             db.get(`SELECT * FROM orders WHERE QRID=${qrId}`, function(error, row) {
                 if (error) {
-                    this.logger.error(error.message || error.toString());
+                    logger.error(error.message || error.toString());
                     db.close();
                     reject(error);
                 } else {
-                    this.logger.info(
+                    logger.info(
                         row
                             ? `Query result: first row: ${JSON.stringify(row)}`
                             : `Query result: 0 rows`
