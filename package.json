@@ -10,6 +10,7 @@
         "build": "rimraf dist && tsc",
         "start":
             "mkdirp logs && npm run build && cross-env NODE_ENV=production forever start dist/app.js",
+        "start:o": "cross-env NODE_ENV=production forever start dist/app.js",
         "stop": "forever stop dist/app.js",
         "start:dev": "mkdirp logs && cross-env NODE_ENV=development node dist/app.js",
         "list": "forever list",
