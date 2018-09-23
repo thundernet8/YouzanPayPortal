@@ -142,13 +142,13 @@ export default class YouzanPayService {
             const params = {
                 tid
             };
-            const resp = await client.invoke("youzan.trade.get", "3.0.0", "GET", params, undefined);
+            const resp = await client.invoke("youzan.trade.get", "4.0.0", "GET", params, undefined);
             this.logger.info(`Fetched order detail resp: ${resp}`);
             const data = JSON.parse(resp.body);
             this.logger.info(`Fetched order detail: ${JSON.stringify(resp.body)}`);
 
-            const qrId = data.response.trade.qr_id;
-            const fansInfo = data.response.trade.fans_info;
+            const qrId = data.response.qr_info.qr_id;
+            const fansInfo = data.response.full_order_info.buyer_info;
             const { fans_id, buyer_id, fans_weixin_openid } = fansInfo;
             const uuid = buyer_id || fans_weixin_openid || fans_id;
             return {
